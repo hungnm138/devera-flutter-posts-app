@@ -1,21 +1,38 @@
 import 'package:flutter/material.dart';
 
+import 'core/theme/app_theme.dart';
+import 'features/post/presentation/bloc/posts/posts_bloc.dart';
 import 'features/post/presentation/pages/posts_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'features/post/presentation/bloc/add_delete_update_post/add_delete_update_post_bloc.dart';
+import 'injection_container.dart' as di;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Posts Page',
-      //theme: AppTheme.light,
-      home: PostsPage(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+            create: (_) => di.sl<PostsBloc>()..add(GetAllPostsEvent())),
+        BlocProvider(create: (_) => di.sl<AddDeleteUpdatePostBloc>()),
+      ],
+      child: MaterialApp(
+        title: 'Posts App',
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
+        home: const PostsPage(),
+      ),
     );
   }
 }
